@@ -182,7 +182,7 @@ th{color:var(--mute);font-weight:600;white-space:nowrap}tr:last-child td{border-
 
 <script>
 /* ---- CONFIG: paste your Supabase project values. Empty = demo mode with sample data ---- */
-const CFG={url:'',key:''};
+const CFG={url:'https://dcigliymvztuupbonlly.supabase.co',key:'sb_publishable_bk9Izzd7s5RnSlV6HCoIQw_G6_k88Sc'};
 const sb=CFG.url&&window.supabase?supabase.createClient(CFG.url,CFG.key,{auth:{flowType:'pkce'}}):null;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
