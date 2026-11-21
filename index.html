@@ -208,7 +208,7 @@ L(10,'Laptop backpack, waterproof',1800,6,2,'new','Hall 1','Padded for up to 15.
 /* ---- Data layer ---- */
 async function getListings(f={}){
   if(sb){
-    let q=sb.from('listings').select('*, seller:profiles(full_name,is_verified,phone)').eq('status','active');
+    let q=sb.from('listings').select('*, seller:profiles!seller_id(full_name,is_verified,phone)').eq('status','active');
     if(f.q)q=q.textSearch('search',f.q.split(/\s+/).join(' & '));
     if(f.cat){const c=CATS.find(x=>x.slug===f.cat);if(c)q=q.eq('category_id',c.id)}
     if(f.uni)q=q.eq('university_id',+f.uni);if(f.cond)q=q.eq('condition',f.cond);
@@ -222,7 +222,7 @@ async function getListings(f={}){
   return f.sort==='price'?r.sort((a,b)=>a.price-b.price):r;
 }
 async function getListing(id){
-  if(sb){const {data}=await sb.from('listings').select('*, seller:profiles(full_name,is_verified,phone)').eq('id',id).single();return data}
+  if(sb){const {data}=await sb.from('listings').select('*, seller:profiles!seller_id(full_name,is_verified,phone)').eq('id',id).single();return data}
   return DEMO.find(l=>l.id===id);
 }
 
@@ -517,7 +517,7 @@ async function admOverview(c){
 }
 async function admListings(c,p){
   const st=p.get('s')||'pending';
-  let q=sb.from('listings').select('id,title,price,status,featured,images,created_at,rejection_reason,seller:profiles(full_name)').order('created_at',{ascending:false}).limit(100);
+  let q=sb.from('listings').select('id,title,price,status,featured,images,created_at,rejection_reason,seller:profiles!seller_id(full_name)').order('created_at',{ascending:false}).limit(100);
   if(st!=='all')q=q.eq('status',st);const {data,error}=await q;if(error)throw error;
   const btn=(a,id,t,o='')=>`<button class="btn sm ${o}" data-act="${a}" data-id="${esc(id)}">${t}</button>`;
   const rows=(data||[]).map(l=>`<tr><td><div class="who"><span class="th">${thumb(l)}</span><div><a href="#/listing/${esc(l.id)}"><b>${esc(l.title)}</b></a><div class="meta">${esc(l.seller?.full_name||'Unknown seller')}</div></div></div></td>
@@ -555,7 +555,7 @@ async function admUsers(c,p){
 }
 async function admReports(c,p){
   const st=p.get('s')||'open';
-  let q=sb.from('reports').select('id,reason,details,status,created_at,listing:listings(id,title,status),reporter:profiles(full_name)').order('created_at',{ascending:false}).limit(100);
+  let q=sb.from('reports').select('id,reason,details,status,created_at,listing:listings!listing_id(id,title,status),reporter:profiles!reporter_id(full_name)').order('created_at',{ascending:false}).limit(100);
   if(st!=='all')q=q.eq('status',st);const {data,error}=await q;if(error)throw error;
   const rows=(data||[]).map(r=>`<tr><td>${r.listing?`<a href="#/listing/${esc(r.listing.id)}"><b>${esc(r.listing.title)}</b></a> ${chip(r.listing.status)}`:'<span class="meta">Listing deleted</span>'}</td>
    <td><b>${esc(r.reason)}</b>${r.details?`<div class="meta">${esc(r.details)}</div>`:''}</td><td>${esc(r.reporter?.full_name||'Unknown')}</td><td>${ago(r.created_at)}</td>
