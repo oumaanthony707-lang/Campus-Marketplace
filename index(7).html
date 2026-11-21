@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Marketplace — Buy and sell on campus in Kenya</title>
+<meta name="description" content="Kenya's student marketplace. Buy and sell phones, laptops, books, furniture and services safely with students at your university.">
+<meta property="og:title" content="Campus Marketplace"><meta property="og:description" content="Buy and sell safely with students at your university.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#1d4ed8">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#f6f8fc;--surface:#fff;--ink:#0f1b33;--mute:#5b6784;--line:#e2e8f3;--blue:#1d4ed8;--blue2:#dbe7ff;--orange:#f97316;--glass:rgba(255,255,255,.72);--r:16px;color-scheme:light}
+:root[data-theme=dark]{--bg:#0b1220;--surface:#131c30;--ink:#eef3ff;--mute:#94a3c4;--line:#243049;--blue:#6b94ff;--blue2:#1b2a52;--glass:rgba(19,28,48,.72);color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:20;background:var(--glass);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:14px;height:64px}
+.logo{font-weight:800;font-size:1.2rem;letter-spacing:-.02em}.logo b{color:var(--orange)}
+.nav .sp{flex:1}.nav a.l{color:var(--mute);font-weight:500}.nav a.l:hover{color:var(--ink)}
+.btn{border:0;border-radius:999px;padding:10px 20px;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}.btn.o{background:var(--orange)}.btn.g{background:var(--blue2);color:var(--blue)}
+.btn.w{background:#16a34a}.ic{width:40px;height:40px;padding:0;display:grid;place-items:center}
+.hero{padding:72px 0 56px;background:radial-gradient(900px 400px at 85% -10%,var(--blue2),transparent),var(--bg)}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.04;letter-spacing:-.035em;margin:0 0 14px;max-width:14em}
+.hero p{color:var(--mute);font-size:1.15rem;max-width:34em;margin:0 0 28px}
+.search{display:flex;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px;max-width:680px;box-shadow:0 12px 40px -18px var(--blue)}
+.search input{flex:1;border:0;background:none;padding:0 14px;outline:0;min-width:0}
+.stats{display:flex;gap:36px;margin-top:34px;flex-wrap:wrap}.stats b{display:block;font-size:1.6rem;color:var(--blue)}.stats span{color:var(--mute);font-size:.9rem}
+section{padding:40px 0}h2{font-size:1.6rem;letter-spacing:-.02em;margin:0 0 20px}
+.row{display:flex;justify-content:space-between;align-items:end}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 10px;text-align:center;font-weight:600;transition:.2s}
+.cat:hover{border-color:var(--orange);transform:translateY(-3px)}.cat i{display:block;font-style:normal;font-size:1.8rem;margin-bottom:4px}
+.unis{display:flex;flex-wrap:wrap;gap:10px}.chip{padding:8px 16px;border-radius:999px;background:var(--blue2);color:var(--blue);font-weight:600}
+.chip:hover{background:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:block;transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 36px -22px var(--ink)}
+.ph{aspect-ratio:4/3;display:grid;place-items:center;font-size:3rem;background:linear-gradient(135deg,var(--blue2),var(--surface));position:relative}
+.ph img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.tag{position:absolute;top:10px;left:10px;background:var(--orange);color:#fff;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:999px;z-index:1}
+.cb{padding:14px}.cb h3{margin:0 0 4px;font-size:1rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price{font-weight:800;color:var(--blue);font-size:1.1rem}.meta{color:var(--mute);font-size:.85rem}
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.cta{background:linear-gradient(120deg,var(--blue),#2f6bff);color:#fff;border-radius:28px;padding:44px;display:flex;gap:20px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.cta h2{margin:0}footer{margin-top:60px;border-top:1px solid var(--line);padding:36px 0;color:var(--mute)}
+footer .cols{display:flex;gap:40px;flex-wrap:wrap;justify-content:space-between}footer a{display:block;padding:3px 0}
+.browse{display:grid;grid-template-columns:260px 1fr;gap:26px;padding:28px 0}
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px;align-content:start;position:sticky;top:84px}
+.f{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.detail{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;padding:28px 0}
+.main-ph{border-radius:24px;overflow:hidden;font-size:6rem}.thumbs{display:flex;gap:10px;margin-top:10px}.thumbs .ph{width:84px;border-radius:12px;font-size:1.4rem;cursor:pointer;border:2px solid transparent}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:14px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.modal{position:fixed;inset:0;background:rgba(5,10,25,.55);backdrop-filter:blur(6px);display:grid;place-items:center;z-index:50;padding:16px}
+.mb{background:var(--surface);border-radius:24px;padding:28px;width:min(420px,100%);display:grid;gap:12px;animation:pop .22s}
+@keyframes pop{from{transform:scale(.95);opacity:0}}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:999px;z-index:60}
+.err{color:#dc2626;font-size:.9rem}.empty{text-align:center;color:var(--mute);padding:60px 0}
+.sc svg{width:100%;height:auto;display:block;border-radius:24px}
+.scs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}.sc div{padding:14px 16px}.sc h3{margin:0 0 4px}.sc p{margin:0;color:var(--mute);font-size:.92rem}
+.bgs{fill:var(--blue2)}.sb{fill:var(--blue)}.so{fill:var(--orange)}.sw{fill:var(--surface)}.sl{fill:var(--line)}.si{fill:var(--ink)}
+.form{max-width:760px;margin:28px auto;display:grid;gap:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:grid;gap:5px;font-weight:600;font-size:.92rem}.form textarea{min-height:110px;resize:vertical}
+.ck{display:flex!important;grid-auto-flow:column;align-items:center;gap:8px!important;font-weight:500!important}.ck input{width:18px;height:18px}
+.drop{border:2px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;cursor:pointer;display:block;background:var(--surface)}.drop:hover{border-color:var(--orange)}
+.drop input{display:none}.pv{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:560px){.two{grid-template-columns:1fr}}
+@media(max-width:820px){.browse,.detail{grid-template-columns:1fr}.filters{position:static}.nav .l{display:none}.hero{padding:44px 0 36px}.cta{padding:28px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+h1,h2,.logo{font-family:Poppins,system-ui,sans-serif}
+.hero{margin:0 -20px;padding:56px 20px 0;border-radius:0 0 32px 32px;overflow:hidden;background:linear-gradient(135deg,#d6e4ff 0%,#eaf1ff 45%,#fff 100%)}
+:root[data-theme=dark] .hero{background:linear-gradient(135deg,#16295a,#0b1220)}
+.hg{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:end}
+.ht{align-self:center;padding-bottom:48px}
+.hero h1{font-size:clamp(2.6rem,7vw,4.7rem);line-height:1.02;color:#0b1f6b;font-weight:800;letter-spacing:-.035em;margin:0 0 20px;max-width:none}
+:root[data-theme=dark] .hero h1{color:var(--ink)}
+.hero p{color:#2c3a66;font-size:1.15rem;max-width:30em;margin:0 0 28px}:root[data-theme=dark] .hero p{color:var(--mute)}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.btn.big{padding:18px 44px;font-size:1.05rem;box-shadow:0 14px 30px -14px var(--orange)}
+.hero .search{max-width:520px}
+.hi img{display:block;width:100%;max-height:560px;object-fit:contain;object-position:bottom;
+ -webkit-mask-image:linear-gradient(to right,transparent,#000 16%,#000 92%,transparent);mask-image:linear-gradient(to right,transparent,#000 16%,#000 92%,transparent)}
+:root[data-theme=dark] .hi img{filter:brightness(.82) contrast(1.05)}
+.ustrip{margin:0 -20px;padding:18px 20px;background:var(--glass);backdrop-filter:blur(10px);display:flex;gap:8px 30px;flex-wrap:wrap;justify-content:center;font-weight:600;letter-spacing:.2em;font-size:.82rem;color:#0b1f6b}
+:root[data-theme=dark] .ustrip{color:var(--ink)}.ustrip a:hover{color:var(--orange)}
+.slot{position:relative}.slot>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(max-width:820px){.hg{grid-template-columns:1fr}.hero{padding-top:36px}.ht{padding-bottom:12px}.hi img{max-height:380px}.ustrip{letter-spacing:.1em}.btn.big{padding:16px 34px}}
+a.btn{display:inline-flex;align-items:center;justify-content:center}
+.fs{display:grid;gap:12px;margin:0}.fs h3{margin:0;font-family:Poppins,system-ui,sans-serif}
+.form label span.err{font-weight:400}.f[aria-invalid]{border-color:#dc2626}
+.drop.on{border-color:var(--orange);background:var(--blue2)}
+.pi{position:relative;width:104px;height:104px;border-radius:12px;overflow:hidden;cursor:grab;border:2px solid var(--line)}
+.pi img{width:100%;height:100%;object-fit:cover;display:block}
+.cover{position:absolute;top:6px;left:6px;background:var(--orange);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.pa{position:absolute;bottom:0;left:0;right:0;display:flex;background:rgba(0,0,0,.6)}
+.pa button{flex:1;border:0;background:none;color:#fff;cursor:pointer;padding:4px 0;font-size:1rem}.pa button:disabled{opacity:.3;cursor:default}
+.ck.tg{justify-content:space-between}
+.ck.tg input{appearance:none;-webkit-appearance:none;width:46px;height:26px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;flex:none}
+.ck.tg input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
+.ck.tg input:checked{background:var(--orange)}.ck.tg input:checked::after{transform:translateX(20px)}
+.authpg{display:grid;place-items:center;padding:48px 0}.authpg .mb{box-shadow:0 20px 50px -28px var(--blue);border:1px solid var(--line)}
+.fab{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--orange);color:#fff;font-weight:700;padding:14px 22px;border-radius:99px;box-shadow:0 12px 28px -10px var(--orange)}
+@media(max-width:820px){.fab{display:block}.nav{gap:8px}.nav .btn{padding:8px 14px}.nav .ic{padding:0}}
+.ah{font-size:1.6rem;margin:0 0 16px}.adm{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:24px 0;align-items:start}
+.side{position:sticky;top:84px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;display:grid;gap:4px}
+.side a{padding:10px 14px;border-radius:12px;font-weight:600;color:var(--mute)}.side a:hover{color:var(--ink)}.side a[aria-current=page]{background:var(--blue2);color:var(--blue)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:2px}a.st:hover{border-color:var(--orange)}
+.st b{font-size:1.7rem;color:var(--blue);font-family:Poppins,system-ui,sans-serif}.st span{color:var(--mute);font-size:.9rem}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--mute);font-weight:600;white-space:nowrap}tr:last-child td{border-bottom:0}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.76rem;font-weight:700;background:var(--blue2);color:var(--blue)}
+.badge.pending{background:rgba(249,115,22,.18);color:var(--orange)}.badge.active,.badge.resolved{background:rgba(22,163,74,.16);color:#16a34a}.badge.rejected,.badge.removed,.badge.dismissed{background:rgba(220,38,38,.14);color:#dc2626}
+.btn.sm{padding:6px 14px;font-size:.85rem}.btn.d{background:#dc2626;color:#fff}.btn:disabled{opacity:.5;cursor:default;transform:none}
+.acts2{display:flex;gap:6px;flex-wrap:wrap}.who{display:flex;gap:10px;align-items:center;min-width:220px}
+.th{width:44px;height:44px;border-radius:10px;background:var(--blue2);display:grid;place-items:center;overflow:hidden;flex:none}.th img{width:100%;height:100%;object-fit:cover}
+.mb label{display:grid;gap:5px;font-weight:600;font-size:.92rem}.mb p{color:var(--ink)}
+.bns{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 0 20px}
+.bn{position:relative;flex:0 0 min(440px,86%);aspect-ratio:21/9;border-radius:var(--r);overflow:hidden;scroll-snap-align:start;display:block;background:var(--blue2)}
+.bn img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.bn span{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 12px;color:#fff;font-weight:700;background:linear-gradient(transparent,rgba(5,10,25,.78))}
+@media(max-width:820px){.adm{grid-template-columns:1fr;gap:14px;padding-top:16px}.side{position:static;display:flex;overflow-x:auto}.side a{white-space:nowrap}.two{grid-template-columns:1fr}}
+.hx{position:relative;margin:16px 0 0;border-radius:28px;overflow:hidden;min-height:min(700px,88vh);display:grid;align-items:center;background:#0f2a6b;color:#fff;isolation:isolate}
+.hbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.hov{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(8,20,60,.9) 0%,rgba(8,20,60,.62) 52%,rgba(8,20,60,.18) 100%)}
+.hc{padding:72px 48px 120px;max-width:720px}
+.hx h1{font-size:clamp(2.5rem,6.5vw,4.6rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 18px;color:#fff;font-weight:800}
+.hx p{color:rgba(255,255,255,.9);font-size:1.15rem;max-width:32em;margin:0 0 28px}
+.btn.gl{background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.4)}
+.hx .search{max-width:540px;box-shadow:0 18px 50px -20px #000}
+.tr{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.tr span{padding:6px 14px;border-radius:99px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);font-size:.88rem;font-weight:600}
+.hfl{position:absolute;right:40px;top:46%;transform:translateY(-50%);display:grid;gap:14px;width:280px}
+.fl{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;background:rgba(255,255,255,.16);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.3);transition:transform .25s}.fl:hover{transform:translateX(-6px)}
+.flp{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--blue2);display:grid;place-items:center;flex:none;font-size:1.6rem}.flp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fl b{display:block;color:#fff}.fl small{color:rgba(255,255,255,.88);display:block;line-height:1.3;max-width:160px}
+.hx .ustrip{position:absolute;left:0;right:0;bottom:0;margin:0;background:rgba(8,20,60,.55);color:#fff;backdrop-filter:blur(12px)}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:170px;gap:14px}
+.bento .bt:nth-child(1){grid-column:span 2;grid-row:span 2}.bento .bt:nth-child(10){grid-column:span 4}
+.bt{position:relative;overflow:hidden;border-radius:20px;display:block;background:linear-gradient(135deg,#1d4ed8,#0f2a6b)}
+.bt i{position:absolute;inset:0;display:grid;place-items:center;font-size:3rem;font-style:normal;opacity:.35}
+.bt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}.bt:hover img{transform:scale(1.07)}
+.bt::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(5,12,35,.8))}
+.bt span{position:absolute;left:16px;bottom:12px;z-index:1;color:#fff;font-weight:700;font-size:1.05rem}
+.ub{position:relative;border-radius:28px;overflow:hidden;min-height:340px;background:#0f2a6b;isolation:isolate;display:grid;align-items:end}
+.ub img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}.ub::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(8,20,60,.15),rgba(8,20,60,.9))}
+.ubc{padding:32px}.ubc h2{color:#fff}.ub .chip{background:rgba(255,255,255,.16);color:#fff;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3)}.ub .chip:hover{background:var(--orange);border-color:var(--orange)}
+.split{display:grid;grid-template-columns:1fr 1.1fr;gap:30px;align-items:center}.spi{position:relative;border-radius:28px;overflow:hidden;min-height:400px;background:var(--blue2)}
+.spi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}[data-hide][data-f]{display:none}.split:has(.spi[data-f]){grid-template-columns:1fr}.qs{display:grid;gap:12px}
+.cta2{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:20px;border-radius:28px;background:linear-gradient(120deg,#dbe7ff,#f3f7ff);padding:44px 44px 0;overflow:hidden}
+:root[data-theme=dark] .cta2{background:linear-gradient(120deg,#16295a,#131c30)}.cta2 h2{font-size:2rem}.cta2>div{padding-bottom:44px;align-self:center}
+.cta2 img{width:100%;max-height:340px;object-fit:contain;object-position:bottom;display:block;-webkit-mask-image:linear-gradient(to right,transparent,#000 20%);mask-image:linear-gradient(to right,transparent,#000 20%)}
+.pb{position:relative;border-radius:24px;overflow:hidden;min-height:190px;margin:20px 0 0;display:grid;align-items:end;background:#0f2a6b;color:#fff;isolation:isolate}
+.pb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}.pb::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(8,20,60,.88),rgba(8,20,60,.25))}
+.pb div{padding:28px 30px}.pb h1{margin:0;font-size:clamp(1.6rem,4vw,2.5rem);color:#fff}.pb p{margin:6px 0 0;color:rgba(255,255,255,.88)}
+.sc .slot{transition:transform .5s}.sc:hover .slot{transform:scale(1.02)}.sc{overflow:hidden}
+@media(max-width:980px){.hfl{display:none}.split,.cta2{grid-template-columns:1fr}.cta2{padding:32px 24px 0}.spi{min-height:260px}}
+@media(max-width:700px){.hc{padding:48px 22px 130px}.hov{background:rgba(8,20,60,.7)}.bento{grid-template-columns:1fr 1fr;grid-auto-rows:150px}.bento .bt:nth-child(1){grid-column:span 2;grid-row:span 1}.bento .bt:nth-child(10){grid-column:span 2}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="logo" href="#/">Campus<b>Market</b></a><span class="sp"></span>
+  <a class="l" href="#/browse">Marketplace</a><a class="l" href="#/browse?cat=services">Services</a>
+  <button class="btn g ic" id="theme" aria-label="Toggle dark mode">◐</button>
+  <a class="btn o" href="#/sell">Sell</a> <span id="authbox"></span>
+</div></header>
+<main id="app" class="wrap"></main>
+<div id="modal"></div><a class="fab" id="fab" href="#/sell">+ Sell</a>
+<footer><div class="wrap cols">
+  <div><div class="logo">Campus<b>Market</b></div><p>Kenya's student marketplace.<br>Safe deals, campus to campus.</p></div>
+  <div><b>Marketplace</b><a href="#/browse">Browse</a><a href="#/browse?cat=books">Books &amp; notes</a><a href="#/browse?cat=electronics">Electronics</a></div>
+  <div><b>Company</b><a href="#/">About</a><a href="#/">Pricing</a><a href="#/">Help center</a></div>
+  <div><b>Legal</b><a href="#/">Privacy</a><a href="#/">Terms</a><a href="https://unsplash.com" target="_blank" rel="noopener">Photos by Unsplash</a><a href="#/photos">Photo check</a></div>
+</div></footer>
+
+<script>
+/* ---- CONFIG: paste your Supabase project values. Empty = demo mode with sample data ---- */
+const CFG={url:'',key:''};
+const sb=CFG.url&&window.supabase?supabase.createClient(CFG.url,CFG.key,{auth:{flowType:'pkce'}}):null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KES=n=>'KES '+Number(n).toLocaleString('en-KE');
+const COND={new:'Brand new',like_new:'Like new',good:'Good',fair:'Fair',for_parts:'For parts'};
+const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2600)};
+
+/* ---- Demo data (mirrors schema; used when Supabase isn't configured) ---- */
+const CATS=[['electronics','Electronics','📱'],['furniture','Furniture','🛏️'],['books','Books & Notes','📚'],['clothes','Clothes','👕'],['shoes','Shoes','👟'],['bags','Bags','🎒'],['kitchen','Kitchen','🍳'],['bicycles','Bicycles','🚲'],['gaming','Gaming','🎮'],['services','Services','🛠️']].map(([slug,name,icon],i)=>({id:i+1,slug,name,icon}));
+const UNIS=[['University of Nairobi','Nairobi'],['Kenyatta University','Kiambu'],['Strathmore University','Nairobi'],['JKUAT','Kiambu'],['Moi University','Uasin Gishu'],['Egerton University','Nakuru'],['Maseno University','Kisumu'],['USIU-Africa','Nairobi']].map(([name,county],i)=>({id:i+1,name,county}));
+const L=(id,title,price,cat,uni,condition,hostel,desc,extra={})=>({id:String(id),title,price,category_id:cat,university_id:uni,condition,hostel,description:desc,negotiable:true,delivery:true,meetup:true,images:[],featured:id<4,created_at:new Date(Date.now()-id*36e5*5).toISOString(),seller:{full_name:['Wanjiru K.','Brian O.','Amina H.','Kevin M.'][id%4],is_verified:id%2==0,phone:'254712345678'},...extra});
+const DEMO=[L(1,'HP EliteBook 840 G5, 8GB RAM, 256GB SSD',32000,1,1,'good','Hall 7','Lightly used for one year. Battery holds about 5 hours. Comes with charger and sleeve.'),
+L(2,'Single bed with 6" mattress',9500,2,2,'good','Hostel B','Sturdy wooden frame. Moving out so must sell by end of month.'),
+L(3,'Engineering Mathematics III — Stroud',1200,3,4,'like_new','Gate C','Clean copy, no highlighting. Includes my solved past papers.'),
+L(4,'Casio fx-991EX Classwiz calculator',2800,1,3,'new','Student Centre','Still in box. Approved for exams.'),
+L(5,'Nike Air Force 1, size 42',4500,5,1,'good','Hall 4','Worn a few times. Clean.'),
+L(6,'Ramtons 2-plate cooker',3200,7,6,'good','Hostel D','Both plates work perfectly. Great for hostel cooking.'),
+L(7,'Mountain bike, 26"',11000,8,5,'fair','Main Gate','Needs a new tyre. Gears are smooth.'),
+L(8,'PS4 slim 500GB + 2 controllers',24000,9,8,'like_new','Hall 2','Includes FIFA and 2 more games.'),
+L(9,'Logo & poster design',1500,10,1,'new','Online','Fast turnaround, 2 revisions included. Portfolio on request.',{negotiable:false,delivery:false}),
+L(10,'Laptop backpack, waterproof',1800,6,2,'new','Hall 1','Padded for up to 15.6" laptops.')];
+
+/* ---- Data layer ---- */
+async function getListings(f={}){
+  if(sb){
+    let q=sb.from('listings').select('*, seller:profiles(full_name,is_verified,phone)').eq('status','active');
+    if(f.q)q=q.textSearch('search',f.q.split(/\s+/).join(' & '));
+    if(f.cat){const c=CATS.find(x=>x.slug===f.cat);if(c)q=q.eq('category_id',c.id)}
+    if(f.uni)q=q.eq('university_id',+f.uni);if(f.cond)q=q.eq('condition',f.cond);
+    if(f.max)q=q.lte('price',+f.max);if(f.feat)q=q.eq('featured',true);
+    q=f.sort==='price'?q.order('price'):q.order('created_at',{ascending:false});
+    const {data,error}=await q.limit(48);if(error)throw error;return data;
+  }
+  let r=DEMO.filter(l=>(!f.q||(l.title+l.description).toLowerCase().includes(f.q.toLowerCase()))&&
+    (!f.cat||CATS.find(c=>c.slug===f.cat)?.id===l.category_id)&&(!f.uni||l.university_id==f.uni)&&
+    (!f.cond||l.condition===f.cond)&&(!f.max||l.price<=+f.max)&&(!f.feat||l.featured));
+  return f.sort==='price'?r.sort((a,b)=>a.price-b.price):r;
+}
+async function getListing(id){
+  if(sb){const {data}=await sb.from('listings').select('*, seller:profiles(full_name,is_verified,phone)').eq('id',id).single();return data}
+  return DEMO.find(l=>l.id===id);
+}
+
+/* ---- Illustrated student scenes (inline SVG, no external images) ---- */
+const P=(x,y,c,skin,hair)=>`<g transform="translate(${x} ${y})"><rect x="-22" y="0" width="44" height="64" rx="18" class="${c}"/><circle cy="-16" r="17" fill="${skin}"/><path d="M-17-19a17 17 0 0 1 34 0z" fill="${hair}"/></g>`;
+const SK=['#8d5a3b','#e0ac82','#6b4128'];
+const SCENES=[
+ `<rect width="400" height="260" class="bgs"/>${[0,1,2,3,4,5,6,7].map(i=>`<rect x="${24+i*46}" y="${24+(i%3)*4}" width="30" height="${56-(i%3)*4}" rx="4" class="${i%2?'so':'sb'}" opacity=".85"/>`).join('')}<rect x="14" y="84" width="372" height="8" class="sl"/>
+  ${P(120,128,'sb',SK[0],'#1b1b1f')}${P(290,128,'so',SK[1],'#3a2a1c')}<rect x="60" y="186" width="280" height="12" rx="6" class="si"/><rect x="62" y="198" width="8" height="52" class="si"/><rect x="330" y="198" width="8" height="52" class="si"/>
+  <rect x="172" y="152" width="58" height="34" rx="4" class="sw"/><rect x="164" y="186" width="74" height="5" rx="2" class="sl"/><text x="201" y="174" font-size="11" text-anchor="middle" class="si" font-weight="700">KES 32k</text>`,
+ `<rect width="400" height="260" class="bgs"/><rect x="0" y="212" width="400" height="48" class="sl"/><rect x="30" y="130" width="170" height="18" rx="6" class="sw"/><rect x="30" y="148" width="170" height="52" rx="6" class="sb"/><rect x="40" y="136" width="44" height="12" rx="6" class="sl"/><rect x="30" y="200" width="8" height="20" class="si"/><rect x="192" y="200" width="8" height="20" class="si"/>
+  <rect x="226" y="164" width="52" height="48" rx="4" class="so"/><rect x="246" y="190" width="56" height="22" rx="4" class="sw"/>
+  ${P(330,128,'sb',SK[2],'#1b1b1f')}<rect x="304" y="150" width="52" height="32" rx="4" class="so"/><rect x="38" y="82" width="104" height="30" rx="15" class="so"/><text x="90" y="102" font-size="13" text-anchor="middle" fill="#fff" font-weight="700">KES 9,500</text>`,
+ `<rect width="400" height="260" class="bgs"/><circle cx="330" cy="54" r="26" class="so" opacity=".9"/><path d="M60 212V110a50 50 0 0 1 100 0v102" fill="none" stroke-width="10" style="stroke:var(--blue)"/><rect x="0" y="212" width="400" height="48" class="sl"/>
+  ${P(150,140,'so',SK[1],'#3a2a1c')}${P(270,140,'sb',SK[0],'#1b1b1f')}<rect x="186" y="132" width="42" height="70" rx="8" class="si"/><rect x="191" y="140" width="32" height="48" rx="4" class="sw"/><circle cx="207" cy="158" r="10" fill="#16a34a"/><path d="M202 158l4 4 7-8" stroke="#fff" stroke-width="3" fill="none"/><text x="207" y="182" font-size="8" text-anchor="middle" class="si" font-weight="700">M-PESA</text>`];
+const SLOT=['library','hostel','meetup'];
+const svg=i=>`<svg viewBox="0 0 400 260" role="img" aria-label="${['Two students swapping a laptop at the library','A student moving a mattress out of a hostel room','Two students confirming an M-Pesa payment at the campus gate'][i]}">${SCENES[i]}</svg>`;
+
+/* ---- Photography: ONE manifest. Swap any ID here; /#/photos shows which ones load. ---- */
+const U=(id,w)=>`https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=75`;
+const PH={campus:'1541339907198-e08756dedf3f',students:'1522202176988-66273c2fd55f',talk:'1517048676732-d65bc937f952',
+ library:'1481627834876-b7833e8f5570',hostel:'1522771739844-6a9f6d5f14af',meetup:'1556742049-0cfed4f6a45d',
+ electronics:'1496181133206-80ce9b88a853',furniture:'1555041469-a586c61ea9bc',books:'1512820790803-83ca734da794',clothes:'1489987707025-afc232f7ea0f',
+ shoes:'1542291026-7eec264c27ff',bags:'1553062407-98eeb64c6a62',kitchen:'1556911220-bff31c812dba',bicycles:'1485965120184-e220f721d03e',
+ gaming:'1550745165-9bc0b252726f',services:'1542744173-8e7e53415bb0'};
+function img(k,w,alt,cls='',pri=false){const id=PH[k];if(!id)return'';const h=Math.round(w*.6);
+  return `<img ${cls?`class="${cls}" `:''}src="${U(id,w)}" srcset="${U(id,h)} ${h}w,${U(id,w)} ${w}w,${U(id,w*2)} ${w*2}w" sizes="(max-width:700px) 100vw,${w}px" alt="${esc(alt)}" ${pri?'fetchpriority="high"':'loading="lazy"'} decoding="async" onerror="this.parentElement.dataset.f=1;this.remove()">`}
+const banner=(k,t,sub,alt)=>`<div class="pb">${img(k,1400,alt)}<div><h1>${esc(t)}</h1><p>${esc(sub)}</p></div></div>`;
+function photosView(){return `<h1 class="ah" style="margin-top:24px">Photo check</h1><p class="meta">Every photo should say “loads”. Replace any broken ID in the PH list inside index.html.</p><div class="grid">${Object.entries(PH).map(([k,id])=>`<div class="box" style="margin:0"><div class="th" style="width:100%;height:150px;border-radius:12px"><img src="${U(id,500)}" alt="${k}" onload="this.closest('.box').querySelector('b').textContent='loads'" onerror="this.closest('.box').querySelector('b').textContent='BROKEN'"></div><p style="margin:8px 0 0"><code>${k}</code> <b>checking…</b></p></div>`).join('')}</div>`}
+
+/* ---- Components ---- */
+const catOf=l=>CATS.find(c=>c.id===l.category_id)||{icon:'📦',name:'Other'};
+const uniOf=l=>UNIS.find(u=>u.id===l.university_id)?.name||'';
+const photo=(l,i=0)=>l.images?.[i]?`<img loading="lazy" src="${esc(l.images[i])}" alt="${esc(l.title)}">`:catOf(l).icon+(/^\d+$/.test(l.id)&&!i?img(catOf(l).slug,600,l.title):'');
+const card=l=>`<a class="card" href="#/listing/${esc(l.id)}"><div class="ph">${l.featured?'<span class="tag">Featured</span>':''}${photo(l)}</div>
+<div class="cb"><div class="price">${KES(l.price)}</div><h3>${esc(l.title)}</h3><div class="meta">${esc(uniOf(l))} · ${COND[l.condition]||''}</div></div></a>`;
+const grid=a=>a.length?`<div class="grid">${a.map(card).join('')}</div>`:`<div class="empty"><h3>No listings match yet</h3><p>Try fewer filters, or <a href="#/sell" style="color:var(--orange);font-weight:600">list one yourself</a>.</p></div>`;
+
+/* ---- Views ---- */
+async function home(){
+  const feat=(await getListings({feat:1})).slice(0,4),banners=await getBanners();
+  const fl=feat.slice(0,2).map(l=>`<a class="fl" href="#/listing/${esc(l.id)}"><span class="flp">${photo(l)}</span><span><b>${KES(l.price)}</b><small>${esc(l.title)}</small></span></a>`).join('');
+  const ALT={library:'Two students swapping a laptop in a campus library',hostel:'A tidy hostel room with a bed and desk',meetup:'A buyer and seller completing a payment'};
+  return `<section class="hx">${img('campus',1600,'Students walking across a university campus','hbg',true)}<div class="hov"></div>
+  <div class="hc"><h1>Buy &amp; sell on campus</h1>
+   <p>Kenya's student marketplace. Find textbooks, phones, hostel gear and services from verified sellers at your university.</p>
+   <div class="hbtns"><a class="btn o big" href="#/browse">Browse Listings</a><a class="btn gl big" href="#/sell">Sell an item</a></div>
+   <form class="search" id="hs"><input name="q" placeholder="Search “calculator”, “mattress”, “tutoring”…" aria-label="Search"><button class="btn">Search</button></form>
+   <div class="tr"><span>Verified student sellers</span><span>Meet on campus</span><span>Free to list</span></div></div>
+  <div class="hfl">${fl}</div>
+  <nav class="ustrip" aria-label="Popular universities">${['Kenyatta University','Moi University','JKUAT','UoN','KU'].map(n=>`<a href="#/browse?q=${encodeURIComponent(n)}">${n}</a>`).join('')}</nav></section>
+  ${bnr(banners)}
+  <section><h2>Shop by category</h2><div class="bento">${CATS.map(c=>`<a class="bt" href="#/browse?cat=${c.slug}"><i aria-hidden="true">${c.icon}</i>${img(c.slug,600,c.name+' for sale from students')}<span>${esc(c.name)}</span></a>`).join('')}</div></section>
+  <section><div class="row"><h2>Featured listings</h2><a class="btn g" href="#/browse">See all</a></div>${grid(feat)}</section>
+  <section><h2>Made for campus life</h2><div class="scs">${[['Finals are over, the laptop goes','Sell gear you no longer need to a coursemate and meet at the library.'],['Moving out of the hostel?','List the bed, cooker and shelves before you hand back the keys.'],['Meet at the gate, pay on your phone','Agree a public spot, inspect the item, then pay.']].map(([h,t],i)=>`<div class="sc"><div class="slot" style="aspect-ratio:4/3">${svg(i)}${img(SLOT[i],800,ALT[SLOT[i]])}</div><div><h3>${h}</h3><p>${t}</p></div></div>`).join('')}</div></section>
+  <section><div class="ub">${img('students',1400,'Students collaborating over laptops at a university')}<div class="ubc"><h2>Popular universities</h2><div class="unis">${UNIS.map(u=>`<a class="chip" href="#/browse?uni=${u.id}">${esc(u.name)}</a>`).join('')}</div></div></div></section>
+  <section><div class="split"><div class="spi" data-hide>${img('talk',900,'Friends talking together on campus')}</div><div><h2>Students are selling</h2><div class="qs">
+   ${[['I sold my old laptop in two days and met the buyer at the library.','Wanjiru, UoN'],['Found a mattress for half the shop price, delivered to my hostel.','Brian, Egerton'],['Graphic design gigs from classmates now pay my fare.','Amina, Strathmore']].map(([t,n])=>`<div class="q"><p style="margin-top:0">“${t}”</p><b>${n}</b></div>`).join('')}</div></div></div></section>
+  <section><div class="cta2"><div><h2>Clearing out your room?</h2><p style="color:var(--mute)">List an item in under two minutes and meet your buyer on campus.</p><a class="btn o big" href="#/sell">Start selling</a></div><img src="images/hero.jpg" alt="A student browsing Campus Marketplace on her laptop" loading="lazy" onerror="this.remove()"></div></section>`;
+}
+async function browse(p){
+  const [catsel,unisel]=[CATS.map(c=>`<option value="${c.slug}" ${p.get('cat')===c.slug?'selected':''}>${c.name}</option>`).join(''),UNIS.map(u=>`<option value="${u.id}" ${p.get('uni')==u.id?'selected':''}>${esc(u.name)}</option>`).join('')];
+  const f=Object.fromEntries(p),res=await getListings(f);
+  const cat=CATS.find(c=>c.slug===p.get('cat'));
+  return `${banner(cat?cat.slug:'students',cat?cat.name:'Marketplace',cat?'Fresh listings from students near you':'Everything students are buying and selling right now',cat?cat.name+' for sale':'Students on campus')}<div class="browse"><form class="filters" id="ff"><b>Filters</b>
+  <input class="f" name="q" placeholder="Search" value="${esc(p.get('q')||'')}">
+  <select class="f" name="cat"><option value="">All categories</option>${catsel}</select>
+  <select class="f" name="uni"><option value="">All universities</option>${unisel}</select>
+  <select class="f" name="cond"><option value="">Any condition</option>${Object.entries(COND).map(([k,v])=>`<option value="${k}" ${p.get('cond')===k?'selected':''}>${v}</option>`).join('')}</select>
+  <input class="f" name="max" type="number" min="0" placeholder="Max price (KES)" value="${esc(p.get('max')||'')}">
+  <select class="f" name="sort"><option value="">Newest</option><option value="price" ${p.get('sort')==='price'?'selected':''}>Price: low to high</option></select>
+  <button class="btn">Apply filters</button></form>
+  <div><div class="row" style="margin-bottom:14px"><p class="meta" style="margin:0">${res.length} listing${res.length===1?'':'s'}</p><a class="btn o" href="#/sell">Sell an item</a></div>${grid(res)}</div></div>`;
+}
+async function detail(id){
+  const l=await getListing(id);if(!l)return `<div class="empty"><h2>Listing not found</h2><a class="btn" href="#/browse">Back to marketplace</a></div>`;
+  const wa=(l.seller?.phone||'').replace(/\D/g,''),msg=encodeURIComponent(`Hi, is "${l.title}" still available on Campus Marketplace?`);
+  const similar=(await getListings({cat:catOf(l).slug})).filter(x=>x.id!==l.id).slice(0,4);
+  window.__l=l;return `<div class="detail"><div><div class="ph main-ph" id="mp">${photo(l)}</div>
+  <div class="thumbs">${(l.images||[]).length>1?l.images.map((_,i)=>`<div class="ph" data-i="${i}">${photo(l,i)}</div>`).join(''):''}</div></div>
+  <div><div class="meta">${esc(catOf(l).name)} · ${esc(uniOf(l))}${l.location?' · '+esc(l.location):''}${l.hostel?' · '+esc(l.hostel):''}</div>
+  <h1 style="margin:6px 0">${esc(l.title)}</h1><div class="price" style="font-size:1.8rem">${KES(l.price)}</div>
+  <div class="meta">${l.negotiable?'Negotiable':'Fixed price'} · ${COND[l.condition]} · ${l.meetup?'Meet-up':''}${l.delivery?' · Delivery':''}</div>
+  <div class="acts">${wa?`<a class="btn w" target="_blank" rel="noopener" href="https://wa.me/${wa}?text=${msg}">WhatsApp seller</a>`:''}
+  <button class="btn" onclick="chat('${esc(l.id)}')">Chat</button><button class="btn g" onclick="save('${esc(l.id)}')">♡ Save</button>
+  <button class="btn g" onclick="share()">Share</button></div>
+  <div class="box"><b>Description</b><p>${esc(l.description)}</p></div>
+  <div class="box"><b>${esc(l.seller?.full_name||'Student seller')}</b> ${l.seller?.is_verified?'<span class="chip" style="padding:2px 10px;font-size:.8rem">Verified student</span>':''}
+   <p class="meta" style="margin:4px 0 0">Meet in a public campus spot and inspect before paying.</p>
+   <button class="btn g" style="margin-top:10px" onclick="report('${esc(l.id)}')">Report listing</button></div></div></div>
+  ${similar.length?`<section><h2>Similar listings</h2>${grid(similar)}</section>`:''}`;
+}
+
+/* ---- Auth ---- */
+let user=null,roles=[],suspended=false;
+function isStaff(){return roles.includes('admin')||roles.includes('moderator')}
+function isAdm(){return roles.includes('admin')}
+async function loadMe(){roles=[];suspended=false;if(!sb||!user)return;try{const [r,p]=await Promise.all([sb.from('user_roles').select('role').eq('user_id',user.id),sb.from('profiles').select('is_suspended').eq('id',user.id).maybeSingle()]);roles=(r.data||[]).map(x=>x.role);suspended=!!p.data?.is_suspended}catch{}}
+function renderAuth(){$('#authbox').innerHTML=user
+  ?`${isStaff()?'<a class="btn g" href="#/admin">Admin</a> ':''}<button class="btn g" onclick="signOut()">Sign out</button>`
+  :`<button class="btn" onclick="authModal()">Sign in</button>`}
+function sell(){location.hash='#/sell'}
+function authModal(mode='in',page=false,next='/'){
+  if(page)try{sessionStorage.setItem('next',next)}catch{}
+  const html=`<div class="modal" onclick="if(event.target===this)this.remove()"><form class="mb" id="af">
+  <h2 style="margin:0">${mode==='in'?'Welcome back':'Create your account'}</h2>
+  ${mode==='up'?'<input class="f" name="name" placeholder="Full name" required autocomplete="name">':''}
+  <input class="f" name="email" type="email" placeholder="University or personal email" required autocomplete="email">
+  <input class="f" name="pw" type="password" placeholder="Password (min 8 characters)" minlength="8" required autocomplete="${mode==='in'?'current-password':'new-password'}">
+  <div class="err" id="ae"></div><button class="btn">${mode==='in'?'Sign in':'Sign up'}</button>
+  <button type="button" class="btn g" id="gg">Continue with Google</button>
+  ${mode==='in'?'<a href="#" id="fp" class="meta">Forgot password?</a>':''}
+  <a href="#" id="sw" class="meta">${mode==='in'?'New here? Create an account':'Have an account? Sign in'}</a></form></div>`;
+  if(page){$('#app').innerHTML=html.replace('class="modal" onclick="if(event.target===this)this.remove()"','class="authpg"')}else $('#modal').innerHTML=html;
+  $('#sw').onclick=e=>{e.preventDefault();authModal(mode==='in'?'up':'in',page,next)};
+  if($('#fp'))$('#fp').onclick=async e=>{e.preventDefault();const em=$('#af').email.value;if(!em)return $('#ae').textContent='Enter your email first.';
+    if(!sb)return $('#ae').textContent='Connect Supabase to enable auth.';await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});toast('Check your email for a reset link')};
+  $('#gg').onclick=()=>sb?sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}):($('#ae').textContent='Connect Supabase (see CFG) to enable Google sign-in.');
+  $('#af').onsubmit=async e=>{e.preventDefault();const f=e.target,err=$('#ae');err.textContent='';
+    if(!sb)return err.textContent='Demo mode: add your Supabase URL and anon key to enable auth.';
+    const r=mode==='in'?await sb.auth.signInWithPassword({email:f.email.value,password:f.pw.value})
+      :await sb.auth.signUp({email:f.email.value,password:f.pw.value,options:{data:{full_name:f.name.value},emailRedirectTo:location.origin+location.pathname}});
+    if(r.error)return err.textContent=r.error.message;
+    if(!page)$('#modal').innerHTML='';toast(mode==='in'?'Signed in':'Check your email to verify your account')};
+}
+async function signOut(){await sb?.auth.signOut();user=null;roles=[];suspended=false;renderAuth();if(location.hash.startsWith('#/admin'))location.hash='#/'}
+if(sb)sb.auth.onAuthStateChange((ev,s)=>{user=s?.user||null;renderAuth();setTimeout(async()=>{await loadMe();renderAuth();if(location.hash.startsWith('#/admin')||location.hash==='#/sell')route()},0);
+  if(ev==='SIGNED_IN'){let n=null;try{n=sessionStorage.getItem('next')}catch{}
+    if(n&&(location.hash.startsWith('#/auth')||location.hash===''||location.hash==='#/')){try{sessionStorage.removeItem('next')}catch{}location.hash='#'+n;return}}
+  if(location.hash==='#/sell')route()});
+
+/* ---- Sell: create listing ---- */
+const MAXPH=8;
+async function shrink(file){
+  const b=await createImageBitmap(file),k=Math.min(1,1280/Math.max(b.width,b.height)),c=document.createElement('canvas');
+  c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext('2d').drawImage(b,0,0,c.width,c.height);b.close?.();
+  return new Promise((ok,no)=>c.toBlob(x=>x?ok(x):no(new Error('encode')),'image/jpeg',.82));
+}
+const opts=(a,ph)=>`<option value="">${ph}</option>`+a.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
+const fld=(k)=>`<span class="err" data-e="${k}" role="alert"></span>`;
+function sellView(){
+  if(suspended)return `<div class="empty"><h2>Your account is suspended</h2><p>You can still browse, but you cannot post listings or send messages. Contact support if you think this is a mistake.</p></div>`;
+  return `${banner('hostel','Turn it into cash','Photos, a price, and you are live in minutes','A tidy hostel room')}<form class="form" id="sf" novalidate>
+  <div><h1 style="margin:0">Sell an item</h1><p class="meta" style="margin:4px 0 0">${sb?'Moderators may review your listing.':'Demo mode: listings stay in this tab until you connect Supabase.'}</p></div>
+  <div class="box fs"><h3>Photos</h3>
+    <label class="drop" id="dz"><input type="file" name="ph" accept="image/jpeg,image/png,image/webp" multiple><b>Drag photos here or tap to upload</b><br><span class="meta">Up to ${MAXPH} photos. The first is your cover. Drag, or use the arrows, to reorder. <span id="pc">0/${MAXPH}</span></span></label>
+    <div class="pv" id="pv"></div>${fld('ph')}</div>
+  <div class="box fs"><h3>Details</h3>
+    <label>Title<input class="f" name="ttl" maxlength="120" placeholder="e.g. HP EliteBook 840, 8GB RAM">${fld('ttl')}</label>
+    <label>Description<textarea class="f" name="desc" maxlength="2000" placeholder="What is included, how old it is, why you are selling"></textarea>${fld('desc')}</label>
+    <div class="two"><label>Category<select class="f" name="cat">${opts(CATS,'Choose a category')}</select>${fld('cat')}</label>
+    <label>Condition<select class="f" name="cond">${Object.entries(COND).map(([k,v])=>`<option value="${k}" ${k==='good'?'selected':''}>${v}</option>`).join('')}</select></label></div></div>
+  <div class="box fs"><h3>Price</h3><div class="two"><label>Price (KES)<input class="f" name="price" type="number" inputmode="numeric" min="0" step="50" placeholder="0">${fld('price')}</label>
+    <label class="ck tg">Negotiable<input type="checkbox" name="neg" checked></label></div></div>
+  <div class="box fs"><h3>Where is it?</h3>
+    <label>University<select class="f" name="uni">${opts(UNIS,'Choose your university')}</select>${fld('uni')}</label>
+    <label>Pick-up location<input class="f" name="loc" maxlength="120" placeholder="e.g. Main gate, Kahawa Wendani">${fld('loc')}</label>
+    <div class="two"><label>Hostel (optional)<input class="f" name="hostel" maxlength="80"></label><label>County (optional)<input class="f" name="county" maxlength="60"></label></div></div>
+  <div class="box fs"><h3>Handover</h3>
+    <label class="ck tg">Meet-up available<input type="checkbox" name="meet" checked></label>
+    <label class="ck tg">Delivery available<input type="checkbox" name="del"></label>
+    <label>Phone / WhatsApp (optional)<input class="f" name="phone" type="tel" placeholder="2547XXXXXXXX" pattern="[0-9+ ]{9,15}"></label></div>
+  <div class="err" data-e="form" role="alert"></div><button class="btn o big sub">Publish listing</button></form>`;
+}
+function initSell(){
+  const f=$('#sf');if(!f)return;const E=f.elements,pv=$('#pv'),dz=$('#dz');let files=[],drag=-1,busy=false;
+  const setErr=(k,m)=>{const el=f.querySelector(`[data-e="${k}"]`);if(el)el.textContent=m||'';const i=E[k];if(i&&i.setAttribute)m?i.setAttribute('aria-invalid','true'):i.removeAttribute('aria-invalid')};
+  const draw=()=>{pv.innerHTML=files.map((x,i)=>`<div class="pi" draggable="true" data-i="${i}"><img src="${x.url}" alt="Photo ${i+1}" draggable="false">${i?'':'<span class="cover">Cover</span>'}<div class="pa"><button type="button" data-a="l" data-i="${i}" aria-label="Move photo ${i+1} earlier" ${i?'':'disabled'}>‹</button><button type="button" data-a="x" data-i="${i}" aria-label="Remove photo ${i+1}">×</button><button type="button" data-a="r" data-i="${i}" aria-label="Move photo ${i+1} later" ${i<files.length-1?'':'disabled'}>›</button></div></div>`).join('');$('#pc').textContent=files.length+'/'+MAXPH};
+  const add=async list=>{setErr('ph');
+    for(const file of list){
+      if(files.length>=MAXPH){setErr('ph',`You can add up to ${MAXPH} photos.`);break}
+      if(!/^image\/(jpeg|png|webp)$/.test(file.type)){setErr('ph','Use JPG, PNG or WebP photos.');continue}
+      if(file.size>15e6){setErr('ph','Each photo must be under 15 MB.');continue}
+      try{const blob=await shrink(file);files.push({blob,url:URL.createObjectURL(blob)})}catch{setErr('ph','One photo could not be read. Try a different file.')}}
+    draw()};
+  E.ph.onchange=async()=>{await add([...E.ph.files]);E.ph.value=''};
+  ['dragenter','dragover'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add('on')}));
+  ['dragleave','drop'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove('on')}));
+  dz.addEventListener('drop',e=>add([...e.dataTransfer.files]));
+  pv.onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i,a=b.dataset.a;
+    if(a==='x'){URL.revokeObjectURL(files[i].url);files.splice(i,1)}
+    else{const j=a==='l'?i-1:i+1;if(j<0||j>=files.length)return;[files[i],files[j]]=[files[j],files[i]]}draw()};
+  pv.ondragstart=e=>{const p=e.target.closest('.pi');if(p){drag=+p.dataset.i;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','')}};
+  pv.ondragover=e=>{if(drag>-1)e.preventDefault()};
+  pv.ondrop=e=>{const p=e.target.closest('.pi');if(drag>-1&&p){e.preventDefault();const [m]=files.splice(drag,1);files.splice(+p.dataset.i,0,m);draw()}drag=-1};
+  pv.ondragend=()=>{drag=-1};
+  const validate=()=>{let ok=true;const bad=(k,m)=>{setErr(k,m);ok=false};
+    ['ph','ttl','desc','cat','price','uni','loc','form'].forEach(k=>setErr(k));
+    if(!files.length)bad('ph','Add at least one photo.');
+    if(E.ttl.value.trim().length<3)bad('ttl','Enter a title of at least 3 characters.');
+    if(E.desc.value.trim().length<10)bad('desc','Describe the item in at least 10 characters.');
+    if(!E.cat.value)bad('cat','Choose a category.');
+    if(E.price.value===''||!(+E.price.value>=0))bad('price','Enter a price in KES.');
+    if(!E.uni.value)bad('uni','Choose your university.');
+    if(!E.loc.value.trim())bad('loc','Enter a pick-up location.');
+    return ok};
+  f.onsubmit=async e=>{e.preventDefault();if(busy)return;
+    if(!validate()){f.querySelector('.err:not(:empty)')?.scrollIntoView({behavior:'smooth',block:'center'});return}
+    busy=true;const b=f.querySelector('.sub');b.disabled=true;b.textContent='Publishing…';
+    const row={title:E.ttl.value.trim(),description:E.desc.value.trim(),price:+E.price.value,negotiable:E.neg.checked,condition:E.cond.value,
+      category_id:+E.cat.value,university_id:+E.uni.value,location:E.loc.value.trim(),hostel:E.hostel.value.trim()||null,county:E.county.value.trim()||null,
+      delivery:E.del.checked,meetup:E.meet.checked};
+    const phone=E.phone.value.replace(/\D/g,''),paths=[];let id,pend=false;
+    try{
+      if(sb){
+        const urls=await Promise.all(files.map(async x=>{const path=`${user.id}/${crypto.randomUUID()}.jpg`;
+          const {error}=await sb.storage.from('listing-images').upload(path,x.blob,{contentType:'image/jpeg',cacheControl:'31536000'});
+          if(error)throw error;paths.push(path);return sb.storage.from('listing-images').getPublicUrl(path).data.publicUrl}));
+        if(phone)await sb.from('profiles').update({phone}).eq('id',user.id);
+        const {data,error}=await sb.from('listings').insert({...row,images:urls,seller_id:user.id}).select('id,status').single();
+        if(error)throw error;id=data.id;pend=data.status==='pending';
+      }else{
+        id='d'+Date.now();
+        DEMO.unshift({...row,id,images:files.map(x=>x.url),featured:false,created_at:new Date().toISOString(),seller:{full_name:'You',is_verified:false,phone}});
+      }
+      toast(pend?'Submitted. A moderator will review it shortly.':'Listing published');location.hash='#/listing/'+id;
+    }catch(ex){
+      if(paths.length)sb.storage.from('listing-images').remove(paths);
+      setErr('form',/row-level security/i.test(ex.message||'')?'Permission denied. Your account may be suspended, or the latest SQL migrations have not been run.':(ex.message||'Could not publish. Check your connection and try again.'));
+      busy=false;b.disabled=false;b.textContent='Publish listing';
+    }};
+}
+async function loadRefs(){if(!sb)return;try{
+  const [c,u]=await Promise.all([sb.from('categories').select('id,name,slug,icon').order('sort'),sb.from('universities').select('id,name,county').order('name')]);
+  if(c.data?.length)CATS.splice(0,CATS.length,...c.data);if(u.data?.length)UNIS.splice(0,UNIS.length,...u.data)}catch{}}
+
+/* ---- Actions ---- */
+async function save(id){if(!user)return authModal();
+  const {error}=await sb.from('saved_listings').upsert({user_id:user.id,listing_id:id});toast(error?'Could not save':'Saved')}
+function chat(){user?toast('Realtime chat arrives in phase 2'):authModal()}
+function share(){navigator.share?navigator.share({url:location.href,title:document.title}):(navigator.clipboard.writeText(location.href),toast('Link copied'))}
+
+/* ---- Admin dashboard (UI only: every action is enforced by RLS on the server) ---- */
+const SECS=[['overview','Overview'],['listings','Listings'],['users','Users'],['reports','Reports'],['content','Banners'],['revenue','Revenue']];
+const ago=t=>t?new Date(t).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'}):'';
+const thumb=l=>l.images?.[0]?`<img src="${esc(l.images[0])}" alt="" loading="lazy">`:'📦';
+const chip=s=>`<span class="badge ${esc(s)}">${esc(s)}</span>`;
+const tbl=(head,rows)=>`<div class="tw"><table><thead><tr>${head.map(h=>`<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows||`<tr><td colspan="${head.length}" class="meta">Nothing here yet.</td></tr>`}</tbody></table></div>`;
+function safeLink(u){u=String(u||'').trim();return /^(https?:\/\/|#\/|\/)/.test(u)?u:''}
+const bnr=a=>a.length?`<section class="bns" aria-label="Promotions">${a.map(b=>{const h=safeLink(b.link),img=/^https?:\/\//.test(b.image_url||'')?b.image_url:'',
+  inner=`<img src="${esc(img)}" alt="${esc(b.title)}" loading="lazy"><span>${esc(b.title)}</span>`;
+  return h?`<a class="bn" href="${esc(h)}" ${/^https?:/.test(h)?'target="_blank" rel="noopener"':''}>${inner}</a>`:`<div class="bn">${inner}</div>`}).join('')}</section>`:'';
+async function getBanners(){if(!sb)return[];try{const {data}=await sb.from('banners').select('id,title,image_url,link').eq('is_active',true).order('sort_order').limit(6);return data||[]}catch{return[]}}
+async function upd(t,id,patch){const {data,error}=await sb.from(t).update(patch).eq('id',id).select('id');if(error)throw error;if(!data?.length)throw new Error('Not allowed, or the item no longer exists.')}
+async function del(t,id){const {data,error}=await sb.from(t).delete().eq('id',id).select('id');if(error)throw error;if(!data?.length)throw new Error('Not allowed, or the item no longer exists.')}
+function dlg(title,body,{ok='Confirm',danger=false}={}){return new Promise(res=>{
+  const m=document.createElement('div'),prev=document.activeElement;m.className='modal';
+  m.innerHTML=`<form class="mb" role="dialog" aria-modal="true" aria-labelledby="dt"><h2 id="dt" style="margin:0;font-size:1.3rem">${esc(title)}</h2>${body}<div class="acts" style="margin:0">${ok?`<button class="btn ${danger?'d':''}">${esc(ok)}</button>`:''}<button type="button" class="btn g" data-x>${ok?'Cancel':'Close'}</button></div></form>`;
+  const close=v=>{m.remove();removeEventListener('keydown',kd);prev?.focus?.();res(v)},kd=e=>{if(e.key==='Escape')close(null)};
+  addEventListener('keydown',kd);
+  m.onclick=e=>{if(e.target===m||e.target.hasAttribute('data-x'))close(null)};
+  m.firstChild.onsubmit=e=>{e.preventDefault();close(Object.fromEntries(new FormData(e.target)))};
+  document.body.append(m);(m.querySelector('textarea,select,input')||m.querySelector('button'))?.focus()})}
+async function report(id){
+  if(!sb)return toast('Reports need Supabase to be connected');if(!user)return authModal();
+  const r=await dlg('Report this listing',`<label>Reason<select class="f" name="reason" required><option value="">Choose a reason</option>${['Spam or scam','Prohibited item','Wrong category','Duplicate listing','Offensive content','Other'].map(x=>`<option>${x}</option>`).join('')}</select></label><label>Details (optional)<textarea class="f" name="details" maxlength="500"></textarea></label>`,{ok:'Send report'});
+  if(!r)return;
+  const {error}=await sb.from('reports').insert({listing_id:id,reporter_id:user.id,reason:r.reason,details:(r.details||'').trim()||null});
+  toast(error?(error.code==='23505'?'You already reported this listing':'Could not send the report'):'Report sent. Thank you.')}
+function bars(days,rows,label){
+  const m={};rows.forEach(r=>{const d=r.created_at.slice(0,10);m[d]=(m[d]||0)+1});
+  const v=days.map(d=>m[d]||0),W=600,H=150,mx=Math.max(1,...v),bw=W/v.length,tot=v.reduce((a,b)=>a+b,0);
+  return `<div class="box"><b>${label}</b> <span class="meta">last 30 days, ${tot} total</span>
+  <svg viewBox="0 0 ${W} ${H+24}" role="img" aria-label="${label}: ${tot} in the last 30 days" style="width:100%;height:auto;margin-top:8px">
+  ${v.map((n,i)=>`<rect x="${i*bw+2}" y="${H-n/mx*H}" width="${bw-4}" height="${Math.max(n/mx*H,n?3:1)}" rx="3" style="fill:${n?'var(--blue)':'var(--line)'}"><title>${days[i]}: ${n}</title></rect>`).join('')}
+  <text x="0" y="${H+16}" font-size="11" style="fill:var(--mute)">${days[0].slice(5)}</text><text x="${W}" y="${H+16}" font-size="11" text-anchor="end" style="fill:var(--mute)">${days[days.length-1].slice(5)}</text>
+  <text x="${W}" y="10" font-size="11" text-anchor="end" style="fill:var(--mute)">peak ${mx}</text></svg></div>`}
+
+async function adminView(sec,p){
+  const secs=SECS.filter(s=>isAdm()||!['content','revenue'].includes(s[0]));
+  if(!secs.some(s=>s[0]===sec)){location.replace('#/admin');return}
+  $('#app').innerHTML=`<div class="adm"><nav class="side" aria-label="Admin sections">${secs.map(([k,n])=>`<a href="#/admin/${k}" ${k===sec?'aria-current="page"':''}>${n}</a>`).join('')}</nav><section id="ac"><div class="empty">Loading…</div></section></div>`;
+  const c=$('#ac');document.title='Admin · Campus Marketplace';
+  try{await ({overview:admOverview,listings:admListings,users:admUsers,reports:admReports,content:admContent,revenue:admRevenue})[sec](c,p)}
+  catch(e){c.innerHTML=`<div class="empty"><h2>Could not load this section</h2><p>${esc(e.message)}</p><p class="meta">If this mentions a missing table or column, run supabase/migrations/003_admin.sql.</p></div>`}
+}
+async function admOverview(c){
+  const d7=new Date(Date.now()-7*864e5).toISOString(),d30=new Date(Date.now()-29*864e5).toISOString().slice(0,10);
+  const days=[...Array(30)].map((_,i)=>new Date(Date.now()-(29-i)*864e5).toISOString().slice(0,10));
+  const cnt=(t,f)=>{let q=sb.from(t).select('*',{count:'exact',head:true});return (f?f(q):q).then(r=>{if(r.error)throw r.error;return r.count??0})};
+  const [users,active,pending,sold,reports,new7,su,ls,st]=await Promise.all([
+    cnt('profiles'),cnt('listings',q=>q.eq('status','active')),cnt('listings',q=>q.eq('status','pending')),cnt('listings',q=>q.eq('status','sold')),
+    cnt('reports',q=>q.eq('status','open')),cnt('profiles',q=>q.gte('created_at',d7)),
+    sb.from('profiles').select('created_at').gte('created_at',d30).limit(5000),sb.from('listings').select('created_at').gte('created_at',d30).limit(5000),
+    sb.from('platform_settings').select('require_approval').eq('id',1).maybeSingle()]);
+  const card=(n,l,h)=>`<${h?`a href="#/admin/${h}"`:'div'} class="st"><b>${n.toLocaleString('en-KE')}</b><span>${l}</span></${h?'a':'div'}>`;
+  c.innerHTML=`<h1 class="ah">Overview</h1><div class="cards">${card(users,'Total users','users')}${card(active,'Active listings','listings?s=active')}${card(pending,'Pending listings','listings?s=pending')}${card(sold,'Sold listings','listings?s=sold')}${card(reports,'Open reports','reports')}${card(new7,'New signups (7 days)','users')}</div>
+  <div class="two" style="margin-top:14px">${bars(days,su.data||[],'Signups')}${bars(days,ls.data||[],'New listings')}</div>
+  <div class="box"><label class="ck tg">Require approval for new listings<input type="checkbox" id="ra" ${st.data?.require_approval?'checked':''} ${isAdm()&&st.data?'':'disabled'}></label>
+  <p class="meta" style="margin:8px 0 0">${st.data?(isAdm()?'When on, new listings stay pending until a moderator approves them.':'Only admins can change this.'):'Run supabase/migrations/003_admin.sql to create the settings row.'}</p></div>`;
+  const ra=$('#ra');ra.onchange=async()=>{try{await upd('platform_settings',1,{require_approval:ra.checked});toast(ra.checked?'New listings now need approval':'New listings publish immediately')}catch(e){ra.checked=!ra.checked;toast(e.message)}};
+}
+async function admListings(c,p){
+  const st=p.get('s')||'pending';
+  let q=sb.from('listings').select('id,title,price,status,featured,images,created_at,rejection_reason,seller:profiles(full_name)').order('created_at',{ascending:false}).limit(100);
+  if(st!=='all')q=q.eq('status',st);const {data,error}=await q;if(error)throw error;
+  const btn=(a,id,t,o='')=>`<button class="btn sm ${o}" data-act="${a}" data-id="${esc(id)}">${t}</button>`;
+  const rows=(data||[]).map(l=>`<tr><td><div class="who"><span class="th">${thumb(l)}</span><div><a href="#/listing/${esc(l.id)}"><b>${esc(l.title)}</b></a><div class="meta">${esc(l.seller?.full_name||'Unknown seller')}</div></div></div></td>
+   <td>${KES(l.price)}</td><td>${chip(l.status)}${l.featured?' <span class="badge">featured</span>':''}${l.rejection_reason?`<div class="meta" title="${esc(l.rejection_reason)}">${esc(l.rejection_reason.slice(0,40))}</div>`:''}</td><td>${ago(l.created_at)}</td>
+   <td><div class="acts2">${['pending','rejected'].includes(l.status)?btn('approve',l.id,'Approve'):''}${['pending','active'].includes(l.status)?btn('reject',l.id,'Reject','g'):''}${l.status==='active'?`<button class="btn sm g" data-act="feature" data-id="${esc(l.id)}" data-v="${l.featured?0:1}">${l.featured?'Unfeature':'Feature'}</button>`:''}${btn('delete',l.id,'Delete','d')}</div></td></tr>`).join('');
+  c.innerHTML=`<div class="row" style="margin-bottom:14px"><h1 class="ah" style="margin:0">Listings</h1><label class="meta">Status <select class="f" id="fs" style="width:auto">${['pending','active','rejected','sold','all'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select></label></div>${tbl(['Listing','Price','Status','Posted','Actions'],rows)}`;
+  $('#fs').onchange=e=>{location.hash='#/admin/listings?s='+e.target.value};
+  c.onclick=async e=>{const b=e.target.closest('button[data-act]');if(!b)return;const id=b.dataset.id,a=b.dataset.act;b.disabled=true;
+    try{
+      if(a==='approve')await upd('listings',id,{status:'active',rejection_reason:null});
+      else if(a==='feature')await upd('listings',id,{featured:b.dataset.v==='1'});
+      else if(a==='reject'){const r=await dlg('Reject listing','<label>Reason shown to the seller<textarea class="f" name="reason" required minlength="5" maxlength="300"></textarea></label>',{ok:'Reject',danger:true});
+        if(!r){b.disabled=false;return}await upd('listings',id,{status:'rejected',rejection_reason:r.reason.trim(),featured:false})}
+      else if(a==='delete'){if(!await dlg('Delete listing','<p style="margin:0">This permanently deletes the listing and its reports. It cannot be undone.</p>',{ok:'Delete',danger:true})){b.disabled=false;return}await del('listings',id)}
+      toast('Done');admListings(c,p)}catch(ex){toast(ex.message);b.disabled=false}};
+}
+async function admUsers(c,p){
+  const q=(p.get('q')||'').trim();
+  let r=sb.from('profiles').select('id,full_name,phone,is_verified,is_suspended,created_at,course,year_of_study,bio,university_id').order('created_at',{ascending:false}).limit(100);
+  if(q)r=r.ilike('full_name','%'+q.replace(/[%,_]/g,'')+'%');const {data,error}=await r;if(error)throw error;
+  const rows=(data||[]).map(u=>`<tr><td><b>${esc(u.full_name||'Unnamed')}</b>${u.is_verified?' <span class="badge active">verified</span>':''}${u.is_suspended?' <span class="badge removed">suspended</span>':''}</td>
+   <td>${esc(UNIS.find(x=>x.id===u.university_id)?.name||'—')}</td><td>${esc(u.phone||'—')}</td><td>${ago(u.created_at)}</td>
+   <td><div class="acts2"><button class="btn sm g" data-act="view" data-id="${esc(u.id)}">View</button><button class="btn sm g" data-act="verify" data-id="${esc(u.id)}" data-v="${u.is_verified?0:1}">${u.is_verified?'Unverify':'Verify'}</button>${u.id===user.id?'':`<button class="btn sm ${u.is_suspended?'':'d'}" data-act="suspend" data-id="${esc(u.id)}" data-v="${u.is_suspended?0:1}">${u.is_suspended?'Unsuspend':'Suspend'}</button>`}</div></td></tr>`).join('');
+  c.innerHTML=`<div class="row" style="margin-bottom:14px"><h1 class="ah" style="margin:0">Users</h1><form id="us" role="search" style="display:flex;gap:8px"><input class="f" name="q" value="${esc(q)}" placeholder="Search by name" aria-label="Search users" style="width:220px"><button class="btn">Search</button></form></div>${tbl(['User','University','Phone','Joined','Actions'],rows)}`;
+  $('#us').onsubmit=e=>{e.preventDefault();location.hash='#/admin/users'+(e.target.q.value.trim()?'?q='+encodeURIComponent(e.target.q.value.trim()):'')};
+  c.onclick=async e=>{const b=e.target.closest('button[data-act]');if(!b)return;const id=b.dataset.id,a=b.dataset.act,u=data.find(x=>x.id===id);b.disabled=true;
+    try{
+      if(a==='view'){const {count}=await sb.from('listings').select('*',{count:'exact',head:true}).eq('seller_id',id);b.disabled=false;
+        await dlg(u.full_name||'Unnamed',`<p class="meta" style="margin:0">Joined ${ago(u.created_at)} · ${count??0} listing${count===1?'':'s'}</p><p style="margin:0">${esc(UNIS.find(x=>x.id===u.university_id)?.name||'No university')}${u.course?' · '+esc(u.course):''}${u.year_of_study?', year '+esc(u.year_of_study):''}</p><p style="margin:0">Phone: ${esc(u.phone||'—')}</p><p style="margin:0">${esc(u.bio||'No bio yet.')}</p>`,{ok:null});return}
+      if(a==='verify')await upd('profiles',id,{is_verified:b.dataset.v==='1'});
+      if(a==='suspend'){const on=b.dataset.v==='1';
+        if(on&&!await dlg('Suspend user','<p style="margin:0">They will no longer be able to post listings or send messages.</p>',{ok:'Suspend',danger:true})){b.disabled=false;return}
+        await upd('profiles',id,{is_suspended:on})}
+      toast('Done');admUsers(c,p)}catch(ex){toast(ex.message);b.disabled=false}};
+}
+async function admReports(c,p){
+  const st=p.get('s')||'open';
+  let q=sb.from('reports').select('id,reason,details,status,created_at,listing:listings(id,title,status),reporter:profiles(full_name)').order('created_at',{ascending:false}).limit(100);
+  if(st!=='all')q=q.eq('status',st);const {data,error}=await q;if(error)throw error;
+  const rows=(data||[]).map(r=>`<tr><td>${r.listing?`<a href="#/listing/${esc(r.listing.id)}"><b>${esc(r.listing.title)}</b></a> ${chip(r.listing.status)}`:'<span class="meta">Listing deleted</span>'}</td>
+   <td><b>${esc(r.reason)}</b>${r.details?`<div class="meta">${esc(r.details)}</div>`:''}</td><td>${esc(r.reporter?.full_name||'Unknown')}</td><td>${ago(r.created_at)}</td>
+   <td>${r.status==='open'?`<div class="acts2"><button class="btn sm" data-act="resolved" data-id="${esc(r.id)}">Resolve</button><button class="btn sm g" data-act="dismissed" data-id="${esc(r.id)}">Dismiss</button></div>`:chip(r.status)}</td></tr>`).join('');
+  c.innerHTML=`<div class="row" style="margin-bottom:14px"><h1 class="ah" style="margin:0">Reports</h1><label class="meta">Status <select class="f" id="fs" style="width:auto">${['open','resolved','dismissed','all'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select></label></div>${tbl(['Listing','Reason','Reported by','Date','Action'],rows)}`;
+  $('#fs').onchange=e=>{location.hash='#/admin/reports?s='+e.target.value};
+  c.onclick=async e=>{const b=e.target.closest('button[data-act]');if(!b)return;b.disabled=true;
+    try{await upd('reports',b.dataset.id,{status:b.dataset.act,resolved_by:user.id,resolved_at:new Date().toISOString()});toast('Report '+b.dataset.act);admReports(c,p)}catch(ex){toast(ex.message);b.disabled=false}};
+}
+async function admContent(c){
+  const {data,error}=await sb.from('banners').select('*').order('sort_order');if(error)throw error;
+  const rows=(data||[]).map(b=>`<tr><td><div class="who"><span class="th">${/^https?:/.test(b.image_url)?`<img src="${esc(b.image_url)}" alt="">`:''}</span><b>${esc(b.title)}</b></div></td><td>${b.sort_order}</td><td>${chip(b.is_active?'active':'removed').replace('removed','hidden')}</td>
+   <td><div class="acts2"><button class="btn sm g" data-act="edit" data-id="${esc(b.id)}">Edit</button><button class="btn sm g" data-act="toggle" data-id="${esc(b.id)}">${b.is_active?'Hide':'Show'}</button><button class="btn sm d" data-act="delete" data-id="${esc(b.id)}">Delete</button></div></td></tr>`).join('');
+  c.innerHTML=`<h1 class="ah">Banners</h1><form class="box fs" id="bf" style="margin-bottom:16px"><h3 id="bh">New banner</h3><input type="hidden" name="id">
+   <div class="two"><label>Title<input class="f" name="title" required maxlength="80"></label><label>Link (optional)<input class="f" name="link" placeholder="https://… or #/browse?cat=books"></label></div>
+   <div class="two"><label>Image file<input class="f" type="file" name="file" accept="image/jpeg,image/png,image/webp"></label><label>…or image URL<input class="f" name="img" placeholder="https://…"></label></div>
+   <div class="two"><label>Sort order<input class="f" type="number" name="sort" value="0"></label><label class="ck tg">Active<input type="checkbox" name="act" checked></label></div>
+   <div class="err" data-e role="alert"></div><div class="acts" style="margin:0"><button class="btn o">Save banner</button><button type="button" class="btn g" id="bc" hidden>Cancel edit</button></div></form>
+   ${tbl(['Banner','Order','Status','Actions'],rows)}`;
+  const f=$('#bf'),E=f.elements,err=f.querySelector('[data-e]'),fresh=()=>admContent(c);
+  f.onsubmit=async e=>{e.preventDefault();err.textContent='';const id=E.id.value,ex=(data||[]).find(b=>b.id===id),link=E.link.value.trim();
+    if(link&&!safeLink(link))return err.textContent='Link must start with https://, / or #/';
+    let url=E.img.value.trim();const file=E.file.files[0];
+    try{
+      if(file){if(!/^image\/(jpeg|png|webp)$/.test(file.type))return err.textContent='Use a JPG, PNG or WebP image.';
+        const path=crypto.randomUUID()+'.jpg',{error:ue}=await sb.storage.from('banners').upload(path,await shrink(file),{contentType:'image/jpeg'});if(ue)throw ue;url=sb.storage.from('banners').getPublicUrl(path).data.publicUrl}
+      else if(url){if(!/^https?:\/\//.test(url))return err.textContent='Image URL must start with https://'}
+      else if(ex)url=ex.image_url;else return err.textContent='Add an image file or URL.';
+      const row={title:E.title.value.trim(),link:link||null,image_url:url,sort_order:+E.sort.value||0,is_active:E.act.checked};
+      if(id)await upd('banners',id,row);else{const {error:ie}=await sb.from('banners').insert(row);if(ie)throw ie}
+      toast('Banner saved');fresh()}catch(x){err.textContent=x.message}};
+  c.onclick=async e=>{const b=e.target.closest('button[data-act],#bc');if(!b)return;if(b.id==='bc')return fresh();
+    const id=b.dataset.id,x=data.find(y=>y.id===id);
+    try{
+      if(b.dataset.act==='edit'){E.id.value=id;E.title.value=x.title;E.link.value=x.link||'';E.img.value=x.image_url;E.sort.value=x.sort_order;E.act.checked=x.is_active;$('#bh').textContent='Edit banner';$('#bc').hidden=false;E.title.focus();return}
+      if(b.dataset.act==='toggle')await upd('banners',id,{is_active:!x.is_active});
+      if(b.dataset.act==='delete'){if(!await dlg('Delete banner','<p style="margin:0">Remove this banner from the homepage?</p>',{ok:'Delete',danger:true}))return;await del('banners',id)}
+      toast('Done');fresh()}catch(ex){toast(ex.message)}};
+}
+async function admRevenue(c){
+  const {data,error}=await sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(10);
+  if(error||!data)return c.innerHTML=`<h1 class="ah">Revenue</h1><div class="empty box"><h2>Payments aren't enabled yet</h2><p>Commission, featured-listing and subscription revenue will appear here once a <code>transactions</code> table exists.</p></div>`;
+  const total=data.reduce((a,t)=>a+(+t.amount||0),0);
+  c.innerHTML=`<h1 class="ah">Revenue</h1><div class="cards"><div class="st"><b>${KES(total)}</b><span>Latest ${data.length} transactions</span></div></div><div style="margin-top:14px">${tbl(['Date','Amount','Status','Reference'],data.map(t=>`<tr><td>${ago(t.created_at)}</td><td>${t.amount!=null?KES(t.amount):'—'}</td><td>${esc(t.status||'—')}</td><td class="meta">${esc(String(t.id).slice(0,8))}</td></tr>`).join(''))}</div>`;
+}
+
+/* ---- Router ---- */
+async function route(){
+  const [path,qs]=(location.hash.slice(1)||'/').split('?'),p=new URLSearchParams(qs||''),app=$('#app');
+  $('#fab').style.visibility=path==='/sell'||path.startsWith('/admin')?'hidden':'';
+  if(path.startsWith('/admin')){if(!isStaff()){location.replace('#/');return}app.innerHTML='<div class="empty">Loading…</div>';await adminView(path.split('/')[2]||'overview',p);scrollTo(0,0);return}
+  if(path==='/sell'&&sb&&!user){location.replace('#/auth?next=%2Fsell');return}
+  if(path==='/auth'){if(user||!sb){location.replace('#'+(p.get('next')||'/'));return}authModal('in',true,p.get('next')||'/');return}
+  app.innerHTML='<div class="empty">Loading…</div>';
+  try{
+    app.innerHTML=path.startsWith('/listing/')?await detail(path.split('/')[2]):path==='/browse'?await browse(p):path==='/sell'?sellView():path==='/photos'?photosView():await home();
+  }catch(e){app.innerHTML=`<div class="empty"><h2>Something went wrong</h2><p>${esc(e.message)}</p></div>`}
+  document.title=path==='/'?'Campus Marketplace — Buy and sell on campus in Kenya':'Campus Marketplace';scrollTo(0,0);
+  if(path==='/sell')initSell();
+  $('#hs')?.addEventListener('submit',e=>{e.preventDefault();location.hash='#/browse?q='+encodeURIComponent(e.target.q.value)});
+  $('#ff')?.addEventListener('submit',e=>{e.preventDefault();const q=new URLSearchParams([...new FormData(e.target)].filter(x=>x[1]));location.hash='#/browse?'+q});
+  document.querySelectorAll('.thumbs .ph').forEach(t=>t.onclick=()=>$('#mp').innerHTML=photo(window.__l||{images:[]},t.dataset.i)||t.innerHTML);
+}
+addEventListener('hashchange',route);
+$('#theme').onclick=()=>{const d=document.documentElement,n=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=n;try{localStorage.setItem('theme',n)}catch{}};
+try{const t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch{}
+(async()=>{if(sb){user=(await sb.auth.getUser()).data.user;await loadRefs();await loadMe();if(location.search.includes('code='))history.replaceState(null,'',location.pathname+location.hash)}renderAuth();route()})();
+</script>
+</body>
+</html>
